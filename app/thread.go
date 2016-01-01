@@ -2,7 +2,6 @@ package app
 
 import (
 	"fmt"
-
 	"./data"
 )
 
@@ -43,6 +42,30 @@ type DThread struct {
 func ToThread()  {
 	oldDB, newDB := data.CreateDB()
 
-	selectSQL := "SELECT fid,name,threads FROM " + DxThread
+	selectSQL := "SELECT tid,fid,authorid,subject,dateline,lastpost,views,replies FROM " + DxThread
 	Data, _ := oldDB.Query(selectSQL)
+
+	insertData := `INSERT INTO ` + XnThread + ` (tid,fid,uid,subject,create_date,last_date,views,posts,userip) VALUES (?,?,?,?,?,?,?,?,'2130706433')`
+	fmt.Println(insertData)
+
+	stmt, err := newDB.Prepare(insertData)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	for Data.Next() {
+		d1 := &DThread{}
+		err = Data.Scan(&d1.Tid, &d1.Fid, &d1.AuthorId, &d1.Subject, &d1.Dateline, &d1.Lastpost, &d1.Views, &d1.Replies)
+
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+		fmt.Println(d1.Tid,d1.Fid,d1.AuthorId,d1.Subject,d1.Dateline,d1.Lastpost,d1.Views,d1.Replies)
+
+		_, err = stmt.Exec(d1.Tid,d1.Fid,d1.AuthorId,d1.Subject,d1.Dateline,d1.Lastpost,d1.Views,d1.Replies)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+	}
 }

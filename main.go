@@ -2,15 +2,13 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"strconv"
 
-	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
-
-	"app"
+	"./app"
 )
 
 func main() {
+	fmt.Println("Into Main")
 
+	//转换版块
+	app.Init()
 }

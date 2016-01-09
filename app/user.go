@@ -2,10 +2,6 @@ package app
 
 import (
 	"fmt"
-	//"encoding/binary"
-
-	"./data"
-	//"net"
 )
 
 const (
@@ -22,6 +18,8 @@ type User struct {
 	Email string  //邮箱
 	UserName string  //用户名
 	Password string  //密码 好像md5
+	Threads int  //主题数
+	Posts int  //回复数
 	Salt int  //加密码
 	CreateIp int  //创建 ip
 	CreateDate int  //创建时间
@@ -43,15 +41,15 @@ type DUser struct {
 }
 
 func ToUser() {
-	oldDB, newDB := data.CreateDB()
+	//oldDB, newDB := data.CreateDB()
 
 	selectSQL := "SELECT uid,groupid,email,username,password,regdate FROM " + DxUser + " WHERE uid > 1 and username != 'admin'"
-	Data, _ := oldDB.Query(selectSQL)
+	Data, _ := OldDB.Query(selectSQL)
 	fmt.Println(selectSQL)
 
-	insertData := `INSERT INTO ` + XnUser + ` (uid,gid,email,username,password,create_date,salt) VALUES (?,?,?,?,?,?,'581249')`
+	insertData := `INSERT INTO ` + XnUser + ` (uid,gid,email,username,password,create_date,salt) VALUES (?,101,?,?,?,?,'581249')`
 
-	stmt, err := newDB.Prepare(insertData)
+	stmt, err := NewDB.Prepare(insertData)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -66,7 +64,7 @@ func ToUser() {
 		}
 		fmt.Println(d1.Uid, d1.GroupId, d1.Email, d1.UserName, d1.Password, d1.RegDate)
 
-		_, err = stmt.Exec(d1.Uid, d1.GroupId, d1.Email, d1.UserName, d1.Password, d1.RegDate)
+		_, err = stmt.Exec(d1.Uid, d1.Email, d1.UserName, d1.Password, d1.RegDate)
 		if err != nil {
 			fmt.Println(err.Error())
 		}

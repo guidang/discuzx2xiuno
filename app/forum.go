@@ -1,9 +1,12 @@
+/**
+ 版块表 - 作废(因 xiuno 版块限制)
+ */
+
 package app
 
 import (
 	"fmt"
 
-	"./data"
 	"time"
 	"strconv"
 )
@@ -34,7 +37,7 @@ type DForum struct {
 }
 
 func ToForum()  {
-	oldDB, newDB := data.CreateDB()
+	oldDB, newDB := CreateDB()
 
 	selectSQL := "SELECT fid,name,threads FROM " + DxForum
 	Data, _ := oldDB.Query(selectSQL)

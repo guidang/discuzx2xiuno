@@ -14,7 +14,7 @@ func Init()  {
 	//ToForum()
 
 	//开关
-	isRun := true
+	isRun := false
 
 	isPost :=  false
 	//导入帖子
@@ -22,7 +22,7 @@ func Init()  {
 		isPost = ToPost()
 	}
 
-	isThread := false
+	isThread := true
 	//导入主题
 	if isPost == true {
 		isThread = ToThread()
@@ -31,8 +31,8 @@ func Init()  {
 
 	isUser := false
 	if isThread == true {
-		//isUser = ToUser()
-		isUser = true
+		isUser = ToUser()
+		//isUser = true
 	}
 	//导入用户
 	//ToUser()
@@ -40,4 +40,7 @@ func Init()  {
 	if isUser == true {
 		fmt.Println("===\n Data Import Success! \n===")
 	}
+
+	//ToMyThreads()  //已导入主帖后，导入帖子归属
+
 }

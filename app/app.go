@@ -22,7 +22,7 @@ func Init()  {
 		isPost = ToPost()
 	}
 
-	isThread := true
+	isThread := false
 	//导入主题
 	if isPost == true {
 		isThread = ToThread()
@@ -36,6 +36,9 @@ func Init()  {
 	}
 	//导入用户
 	//ToUser()
+
+	isUser,msg := UpdateUser()
+	fmt.Println(msg)
 
 	if isUser == true {
 		fmt.Println("===\n Data Import Success! \n===")

@@ -1,13 +1,13 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
 	"./app"
 )
 
 func main() {
-	fmt.Println("Into Main")
+	log.Println(":::正在进入程序:::")
 
 	//转换版块
 	app.Init()

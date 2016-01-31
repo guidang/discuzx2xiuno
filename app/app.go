@@ -1,8 +1,58 @@
 package app
-import "fmt"
+
+import (
+	"log"
+	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
+)
 
 //数据库初始化
-var OldDB,NewDB = CreateDB()
+var (
+	OldDB,
+	NewDB *sql.DB
+	ClearTB = true  //是否先清理表
+)
+
+func Init() {
+	log.Println(":::正在进入app主程序:::")
+	OldDB, NewDB = connDB()
+
+	_, msg := ToPost()
+	log.Fatalln(msg)
+}
+
+/**
+   连接新旧数据库
+ */
+func connDB() (*sql.DB, *sql.DB) {
+	log.Println(":::正在连接数据库:::")
+
+	old := &Hostinfo{
+		DBUser: "root",
+		DBPassword: "123456",
+		DBname: "gxvtc",
+	}
+
+	new := &Hostinfo{
+		DBUser: "root",
+		DBPassword: "123456",
+		DBname: "xiuno",
+	}
+
+	oldDB, err := connectMysql(old)
+	if err != nil {
+		log.Println("old db connect err: " + err.Error())
+	}
+
+	newDB, err := connectMysql(new)
+	if err != nil {
+		log.Println("new db connect err: " + err.Error())
+	}
+
+	return oldDB, newDB
+}
+
+/*
 
 func Init3() {
 	ToThread()
@@ -38,12 +88,13 @@ func Init()  {
 	//ToUser()
 
 	isUser,msg := UpdateUser()
-	fmt.Println(msg)
+	log.Println(msg)
 
 	if isUser == true {
-		fmt.Println("===\n Data Import Success! \n===")
+		log.Println("===\n Data Import Success! \n===")
 	}
 
 	//ToMyThreads()  //已导入主帖后，导入帖子归属
 
 }
+*/

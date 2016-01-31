@@ -1,7 +1,9 @@
 package app
 
 import (
+	"log"
 	"fmt"
+	"github.com/frustra/bbcode"
 )
 
 const (
@@ -39,43 +41,65 @@ type DPost struct {
 	Subject  string  //标题
 }
 
-func ToPost() bool {
+/**
+  导入 posts 表
+ */
+func ToPost() (bool, string) {
+	log.Println(":::正在导入 posts...")
 
-	//oldDB, newDB := CreateDB()
+	selectSQL := "SELECT tid,pid,authorid,first,dateline,useip,message,fid,subject FROM " + DxPost + " limit 100"
+	insertSQL := "INSERT INTO " + XnPost + " (tid,pid,uid,isfirst,create_date,userip,sid,message) VALUES (?,?,?,?,?,?,?,?)"
 
-	selectSQL := "SELECT tid,pid,authorid,first,dateline,useip,message,fid,subject FROM " + DxPost// + " limit 1"
-	Data, _ := OldDB.Query(selectSQL)
-
-	insertData := `INSERT INTO ` + XnPost + ` (tid,pid,uid,isfirst,create_date,userip,sid,message) VALUES (?,?,?,?,?,?,?,?)`
-
-	stmt, err := NewDB.Prepare(insertData)
-	if err != nil {
-		fmt.Println(err.Error())
-		fmt.Println("预插入数据", insertData)
-		return false
+	var clearErr error
+	if ClearTB {
+		clearErr = clearPost()
 	}
 
-	for Data.Next() {
-		d1 := &DPost{}
-		err = Data.Scan(&d1.Tid, &d1.Fid, &d1.AuthorId, &d1.First, &d1.Dateline, &d1.UseIp, &d1.Message, &d1.Fid, &d1.Subject)
+	if clearErr != nil {
+		return false, fmt.Sprintf(ClearErrMsg, XnPost, clearErr)
+	}
 
+	data, _ := OldDB.Query(selectSQL)
+	stmt, err := NewDB.Prepare(insertSQL)
+	if err != nil {
+		return false, fmt.Sprintf(PreInsertErr, insertSQL, err)
+	}
+
+	var insertCount int
+	for data.Next() {
+		d1 := &DPost{}
+		err = data.Scan(&d1.Tid, &d1.Fid, &d1.AuthorId, &d1.First, &d1.Dateline, &d1.UseIp, &d1.Message, &d1.Fid, &d1.Subject)
 		if err != nil {
-			fmt.Println(err.Error())
-			fmt.Println("取数据出错", selectSQL)
-			return false
+			return false, fmt.Sprintf(SelectErr, selectSQL, err)
 		}
-		//fmt.Println(d1.Tid,d1.Fid,d1.AuthorId,d1.First,d1.Dateline,d1.UseIp,d1.Message,d1.Fid,d1.Subject)
 
 		useIp := Ip2long(d1.UseIp)
 
-		_, err = stmt.Exec(d1.Tid,d1.Pid,d1.AuthorId,d1.First,d1.Dateline,useIp,Sid,d1.Message)
+		compiler := bbcode.NewCompiler(true, true)
+		d1.Message = compiler.Compile(d1.Message)
 
+		_, err = stmt.Exec(d1.Tid,d1.Pid,d1.AuthorId,d1.First,d1.Dateline,useIp,Sid,d1.Message)
 		if err != nil {
-			fmt.Println(err.Error())
-			fmt.Println("插入数据出错", insertData)
-			return false
+			return false, fmt.Sprintf(InsertErr, XnPost, err)
 		}
+
+		insertCount++
 	}
 
-	return true;
+	return true, fmt.Sprintf(InsertSuccess, XnPost, insertCount)
+}
+
+/**
+  清理 posts 表
+ */
+func clearPost() error {
+	log.Println(":::正在清理 posts 表:::")
+	clearSQL := "TRUNCATE TABLE " + XnPost
+
+	_, err := NewDB.Exec(clearSQL)
+	if err != nil {
+		log.Println(":::清理 posts 失败: " + err.Error())
+	}
+
+	return err
 }

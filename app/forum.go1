@@ -37,7 +37,6 @@ type DForum struct {
 }
 
 func ToForum()  {
-	oldDB, newDB := CreateDB()
 
 	selectSQL := "SELECT fid,name,threads FROM " + DxForum
 	Data, _ := oldDB.Query(selectSQL)

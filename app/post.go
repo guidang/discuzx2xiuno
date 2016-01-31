@@ -47,15 +47,11 @@ type DPost struct {
 func ToPost() (bool, string) {
 	log.Println(":::正在导入 posts...")
 
-	selectSQL := "SELECT tid,pid,authorid,first,dateline,useip,message,fid,subject FROM " + DxPost + " limit 100"
+	selectSQL := "SELECT tid,pid,authorid,first,dateline,useip,message,fid,subject FROM " + DxPost + " LIMIT 100"
 	insertSQL := "INSERT INTO " + XnPost + " (tid,pid,uid,isfirst,create_date,userip,sid,message) VALUES (?,?,?,?,?,?,?,?)"
 
 	var clearErr error
-	if ClearTB {
-		clearErr = clearPost()
-	}
-
-	if clearErr != nil {
+	if clearErr = ClearTable(XnPost); clearErr != nil {
 		return false, fmt.Sprintf(ClearErrMsg, XnPost, clearErr)
 	}
 
@@ -87,19 +83,4 @@ func ToPost() (bool, string) {
 	}
 
 	return true, fmt.Sprintf(InsertSuccess, XnPost, insertCount)
-}
-
-/**
-  清理 posts 表
- */
-func clearPost() error {
-	log.Println(":::正在清理 posts 表:::")
-	clearSQL := "TRUNCATE TABLE " + XnPost
-
-	_, err := NewDB.Exec(clearSQL)
-	if err != nil {
-		log.Println(":::清理 posts 失败: " + err.Error())
-	}
-
-	return err
 }

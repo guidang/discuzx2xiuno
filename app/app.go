@@ -18,7 +18,9 @@ func Init() {
 	OldDB, NewDB = connDB()
 
 	_, msg := ToPost()
-	log.Fatalln(msg)
+	log.Println(msg)
+
+	ToThread()
 }
 
 /**
@@ -50,6 +52,21 @@ func connDB() (*sql.DB, *sql.DB) {
 	}
 
 	return oldDB, newDB
+}
+
+/**
+  清理 表
+ */
+func ClearTable(tbname string) error {
+	log.Println(":::正在清理 " + tbname + " 表:::")
+	clearSQL := "TRUNCATE TABLE " + tbname
+
+	_, err := NewDB.Exec(clearSQL)
+	if err != nil {
+		log.Println(":::清理 " + tbname + " 失败: " + err.Error())
+	}
+
+	return err
 }
 
 /*

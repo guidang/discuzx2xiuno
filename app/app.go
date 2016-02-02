@@ -20,7 +20,11 @@ func Init() {
 	_, msg := ToPost()
 	log.Println(msg)
 
-	ToThread()
+	_, msg = ToThread()
+	log.Println(msg)
+
+	_, msg = ToForum()
+	log.Println(msg)
 }
 
 /**

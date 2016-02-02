@@ -55,7 +55,10 @@ func ToPost() (bool, string) {
 		return false, fmt.Sprintf(ClearErrMsg, XnPost, clearErr)
 	}
 
-	data, _ := OldDB.Query(selectSQL)
+	data, err := OldDB.Query(selectSQL)
+	if err != nil {
+		return false, fmt.Sprintf(SelectErr, selectSQL, err)
+	}
 	stmt, err := NewDB.Prepare(insertSQL)
 	if err != nil {
 		return false, fmt.Sprintf(PreInsertErr, insertSQL, err)

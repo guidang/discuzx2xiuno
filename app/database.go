@@ -3,6 +3,7 @@ package app
 import (
 	"database/sql"
 	"log"
+	"strings"
 )
 
 type Hostinfo struct {
@@ -30,4 +31,20 @@ func connectMysql(host *Hostinfo) (*sql.DB, error) {
 
 	db, err := sql.Open("mysql", host.DBUser+":"+host.DBPassword+"@"+host.DBHost+"/"+host.DBname+"?charset="+host.DBChar)
 	return db, err
+}
+
+/**
+  数据库加前缀
+ */
+func FieldAddPrev(prev, fieldStr string) string {
+	fieldArr := strings.Split(fieldStr, ",")
+
+	prev = prev + "."
+	var newFieldArr []string
+	for _, v := range fieldArr {
+		newFieldArr = append(newFieldArr, prev+v)
+	}
+	newFieldStr := strings.Join(newFieldArr, ",")
+
+	return newFieldStr
 }

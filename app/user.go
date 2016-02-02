@@ -3,10 +3,12 @@ package app
 import (
 	"fmt"
 	"strings"
+	"log"
 )
 
 const (
 	DxUser = "pre_common_member"
+	DxUcUser = "uc_members"
 	XnUser = "bbs_user"
 )
 
@@ -33,12 +35,15 @@ type User struct {
  dx 用户表
  */
 type DUser struct {
-	Uid int  //用户 id
-	GroupId int  //用户组 id
-	Email string  //邮箱
-	UserName string  //用户名
-	Password string  //密码
+	Uid,  //用户 id
+	GroupId,  //用户组 id
 	RegDate int  //注册时间
+	Email,  //邮箱
+	UserName,  //用户名
+	Password,  //密码
+	Salt,  //加密 key
+	UcPassword,  //uc中的密码
+	Regip string  //注册 ip
 }
 
 //按字段分组
@@ -57,27 +62,35 @@ type UserInfo struct {
 
 var userInfos []UserInfo
 
-func ToUser() bool {
-	//oldDB, newDB := data.CreateDB()
+func ToUser() (bool, string) {
+	log.Println(":::正在导入 users...")
+
+	mField := FieldAddPrev("m", "uid,groupid,email,username,password,regdate")
+	uField := FieldAddPrev("u", "salt,password,regip")
+	selectSQL := "SELECT " + mField + "," + uField + " FROM " + DxUser + " m LEFT JOIN " + DxUcUser + " u ON u.uid = m.uid WHERE m.uid < 10"
+	insertSQL := `INSERT INTO ` + XnUser + ` (uid,gid,email,username,password,create_date,salt,threads,posts) VALUES (?,101,?,?,?,?,'581249',?,?)`
+
+	var clearErr error
+	if clearErr = ClearTable(XnUser); clearErr != nil {
+		return false, fmt.Sprintf(ClearErrMsg, XnUser, clearErr)
+	}
+
 	//用户主帖和回复统计
-	selectTotal := "SELECT (SELECT count(*) FROM `bbs_thread` WHERE uid = ?) AS mythreads, (SELECT COUNT(*) FROM bbs_post WHERE uid = ?) AS myposts"
+	//selectTotal := "SELECT (SELECT count(*) FROM `bbs_thread` WHERE uid = ?) AS mythreads, (SELECT COUNT(*) FROM bbs_post WHERE uid = ?) AS myposts"
 
-	selectSQL := "SELECT uid,groupid,email,username,password,regdate FROM " + DxUser + " WHERE uid > 21690"
-	Data, _ := OldDB.Query(selectSQL)
-	fmt.Println(selectSQL)
-
-	insertData := `INSERT INTO ` + XnUser + ` (uid,gid,email,username,password,create_date,salt,threads,posts) VALUES (?,101,?,?,?,?,'581249',?,?)`
-
-	stmt, err := NewDB.Prepare(insertData)
+	data, err := OldDB.Query(selectSQL)
 	if err != nil {
-		fmt.Println(err.Error())
-		return false
+		return false, fmt.Sprintf(SelectErr, selectSQL, err)
+	}
+	stmt, err := NewDB.Prepare(insertSQL)
+	if err != nil {
+		return false, fmt.Sprintf(PreInsertErr, insertSQL, err)
 	}
 
 	//初始化用户资料
 	newUser := &NewUsers{}
 	//按用户分组
-
+/*
 	postSQL := "UPDATE " + XnPost + " SET uid = ? WHERE uid = ?"
 	threadSQL := "UPDATE " + XnThread + " SET uid = ? WHERE uid = ?"
 	myThreadSQL := "UPDATE " + XnMyThread + " SET uid = ? WHERE uid = ?"
@@ -93,14 +106,13 @@ func ToUser() bool {
 		for _, v := range userInfos {
 			newUser.UserNames = append(newUser.UserNames, v.Username)
 		}
-	}
+	}*/
 
-	for Data.Next() {
+	for data.Next() {
 		d1 := &DUser{}
-		err = Data.Scan(&d1.Uid, &d1.GroupId, &d1.Email, &d1.UserName, &d1.Password, &d1.RegDate)
+		err = data.Scan(&d1.Uid, &d1.GroupId, &d1.Email, &d1.UserName, &d1.Password, &d1.RegDate,&d1.Salt, &d1.UcPassword, &d1.Regip)
 		if err != nil {
-			fmt.Println(err.Error())
-			return false
+			return false, fmt.Sprintf(SelectErr, selectSQL, err)
 		}
 
 		sameEmail := false

@@ -16,7 +16,7 @@ var (
 func Init() {
 	log.Println(":::正在进入app主程序:::")
 	OldDB, NewDB = connDB()
-
+/*
 	_, msg := ToPost()
 	log.Println(msg)
 
@@ -24,6 +24,9 @@ func Init() {
 	log.Println(msg)
 
 	_, msg = ToForum()
+	log.Println(msg)*/
+
+	_, msg := ToUser()
 	log.Println(msg)
 }
 

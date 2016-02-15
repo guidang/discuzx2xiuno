@@ -11,12 +11,14 @@ var (
 	OldDB,
 	NewDB *sql.DB
 	ClearTB = true  //是否先清理表
+	MergeUser = true  //是否合并用户
+	ResetPost = false
 )
 
 func Init() {
 	log.Println(":::正在进入app主程序:::")
 	OldDB, NewDB = connDB()
-/*
+
 	_, msg := ToPost()
 	log.Println(msg)
 
@@ -24,10 +26,16 @@ func Init() {
 	log.Println(msg)
 
 	_, msg = ToForum()
-	log.Println(msg)*/
-
-	_, msg := ToUser()
 	log.Println(msg)
+
+	_, msg = ToUser()
+	log.Println(msg)
+
+	/* 更新全部用户帖子数量 */
+	if ResetPost {
+		_, msg := doUserPosts()
+		log.Println(msg)
+	}
 }
 
 /**

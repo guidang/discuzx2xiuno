@@ -48,7 +48,7 @@ func ToThread() (bool, string) {
 
 	//查找最早、最迟的 PostId 及最迟的 PostIP
 	selectThread := `SELECT (SELECT userip FROM ` + XnPost + ` WHERE tid = ? AND isfirst = 1 LIMIT 1) as userip, (SELECT pid FROM bbs_post WHERE tid = ? AND isfirst = 1 LIMIT 1) AS minpid, pid, uid FROM ` + XnPost + ` WHERE tid = ? ORDER BY create_date DESC LIMIT 1`
-	selectSQL := "SELECT tid,fid,authorid,subject,dateline,lastpost,views,replies FROM " + DxThread + " LIMIT 100"
+	selectSQL := "SELECT tid,fid,authorid,subject,dateline,lastpost,views,replies FROM " + DxThread  // + " LIMIT 100"
 	insertSQL := `INSERT INTO ` + XnThread + ` (fid,tid,uid,userip,subject,create_date,last_date,views,posts,firstpid,lastuid,lastpid) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`
 	myThreadsSQL := "INSERT INTO " + XnMyThread + " VALUES (?,?)"
 

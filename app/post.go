@@ -47,7 +47,7 @@ type DPost struct {
 func ToPost() (bool, string) {
 	log.Println(":::正在导入 posts...")
 
-	selectSQL := "SELECT tid,pid,authorid,first,dateline,useip,message,fid,subject FROM " + DxPost + " LIMIT 100"
+	selectSQL := "SELECT tid,pid,authorid,first,dateline,useip,message,fid,subject FROM " + DxPost// + " LIMIT 100"
 	insertSQL := "INSERT INTO " + XnPost + " (tid,pid,uid,isfirst,create_date,userip,sid,message) VALUES (?,?,?,?,?,?,?,?)"
 
 	var clearErr error

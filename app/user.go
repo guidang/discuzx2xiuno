@@ -83,7 +83,7 @@ func ToUser() (bool, string) {
 	mField := FieldAddPrev("m", "uid,groupid,email,username,password,regdate")
 	uField := FieldAddPrev("u", "salt,password")
 	sField := FieldAddPrev("s", "regip,lastip,lastvisit")
-	selectSQL := "SELECT " + mField + "," + uField + "," + sField + " FROM " + DxUser + " m LEFT JOIN " + DxUcUser + " u ON u.uid = m.uid LEFT JOIN " + DxUserStatus + " s ON s.uid = m.uid"// WHERE m.uid < 10"
+	selectSQL := "SELECT " + mField + "," + uField + "," + sField + " FROM " + DxUser + " m LEFT JOIN " + DxUcUser + " u ON u.uid = m.uid LEFT JOIN " + DxUserStatus + " s ON s.uid = m.uid ORDER BY m.uid ASC"// WHERE m.uid < 10"
 	insertSQL := "INSERT INTO " + XnUser + " (uid,gid,email,username,password,salt,create_ip,create_date,login_ip,login_date) VALUES (?,101,?,?,?,?,?,?,?,?)"
 
 	var clearErr error
@@ -139,9 +139,22 @@ func ToUser() (bool, string) {
 	var insertCount int
 	for data.Next() {
 		d1 := &DUser{}
-		err = data.Scan(&d1.Uid, &d1.GroupId, &d1.Email, &d1.UserName, &d1.Password, &d1.RegDate,&d1.Salt, &d1.UcPassword, &d1.Regip, &d1.Lastip, &d1.Lastvisit)
+		var salt, password []byte
+		err = data.Scan(&d1.Uid, &d1.GroupId, &d1.Email, &d1.UserName, &d1.Password, &d1.RegDate,&salt,&password, &d1.Regip, &d1.Lastip, &d1.Lastvisit)
 		if err != nil {
-			return false, fmt.Sprintf(SelectErr, selectSQL, err)
+			return false, fmt.Sprintf(SelectErr, d1.Uid, err)
+		}
+
+		if salt == nil {
+			d1.Salt = "111111"
+                } else {
+			d1.Salt = string(salt)	
+		}
+
+		if password == nil {
+			d1.UcPassword = d1.Password
+		} else {
+			d1.UcPassword = string(password)
 		}
 
 		/* 合并用户 */

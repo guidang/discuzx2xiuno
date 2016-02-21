@@ -9,7 +9,7 @@ import (
 type Hostinfo struct {
 	DBUser,
 	DBPassword,
-	DBname,
+	DBName,
 	DBHost,
 	DBPort,
 	DBChar string
@@ -19,6 +19,10 @@ type Hostinfo struct {
   连接数据库
 */
 func connectMysql(host *Hostinfo) (*sql.DB, error) {
+	if host.DBPort == "" {
+		host.DBPort = "3306"
+	}
+
 	if host.DBHost != "" {
 		host.DBHost = "tcp(" + host.DBHost + ":" + host.DBPort + ")"
 		log.Println(":::连接到 MySQL:" + host.DBHost)
@@ -29,7 +33,7 @@ func connectMysql(host *Hostinfo) (*sql.DB, error) {
 		log.Println(":::MySQL 字符集为:" + host.DBChar)
 	}
 
-	db, err := sql.Open("mysql", host.DBUser+":"+host.DBPassword+"@"+host.DBHost+"/"+host.DBname+"?charset="+host.DBChar)
+	db, err := sql.Open("mysql", host.DBUser+":"+host.DBPassword+"@"+host.DBHost+"/"+host.DBName+"?charset="+host.DBChar)
 	return db, err
 }
 

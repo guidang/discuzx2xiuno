@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"./app"
+	"github.com/skiy/dxToXiuno/app"
 )
 
 func main() {

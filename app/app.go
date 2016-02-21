@@ -47,13 +47,13 @@ func connDB() (*sql.DB, *sql.DB) {
 	old := &Hostinfo{
 		DBUser: "root",
 		DBPassword: "123456",
-		DBname: "gxvtc",
+		DBName: "gxvtc",
 	}
 
 	new := &Hostinfo{
 		DBUser: "root",
 		DBPassword: "123456",
-		DBname: "xiuno",
+		DBName: "xiuno",
 	}
 
 	oldDB, err := connectMysql(old)

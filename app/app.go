@@ -47,7 +47,7 @@ func connDB() (*sql.DB, *sql.DB) {
 	old := &Hostinfo{
 		DBUser: "root",
 		DBPassword: "123456",
-		DBName: "gxvtc",
+		DBName: "discuzx",
 	}
 
 	new := &Hostinfo{
@@ -83,50 +83,3 @@ func ClearTable(tbname string) error {
 
 	return err
 }
-
-/*
-
-func Init3() {
-	ToThread()
-}
-
-func Init()  {
-
-	//导入版块
-	//ToForum()
-
-	//开关
-	isRun := false
-
-	isPost :=  false
-	//导入帖子
-	if isRun == true {
-		isPost = ToPost()
-	}
-
-	isThread := false
-	//导入主题
-	if isPost == true {
-		isThread = ToThread()
-	}
-	//ToThread()
-
-	isUser := false
-	if isThread == true {
-		isUser = ToUser()
-		//isUser = true
-	}
-	//导入用户
-	//ToUser()
-
-	isUser,msg := UpdateUser()
-	log.Println(msg)
-
-	if isUser == true {
-		log.Println("===\n Data Import Success! \n===")
-	}
-
-	//ToMyThreads()  //已导入主帖后，导入帖子归属
-
-}
-*/

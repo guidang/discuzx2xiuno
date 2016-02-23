@@ -9,7 +9,7 @@ import (
 
 const (
 	DxUser = "pre_common_member"
-	DxUcUser = "uc_members"
+	DxUcUser = "pre_ucenter_members"
 	DxUserStatus = "pre_common_member_status"
 	XnUser = "bbs_user"
 )
@@ -101,100 +101,12 @@ func ToUser() (bool, string) {
 		return false, fmt.Sprintf(PreInsertErr, insertSQL, err)
 	}
 
-	/** 合并用户 **/
-	var PostPre, ThreadPre, MyThreadPre *sql.Stmt
-	//初始化用户列表资料
-	newUser := &NewUsers{}
-
-	if MergeUser {
-		//按用户分组
-
-		mpostSQL := "UPDATE " + XnPost + " SET uid = ? WHERE uid = ?"
-		mthreadSQL := "UPDATE " + XnThread + " SET uid = ? WHERE uid = ?"
-		mmyThreadSQL := "UPDATE " + XnMyThread + " SET uid = ? WHERE uid = ?"
-
-		PostPre, _ = NewDB.Prepare(mpostSQL)
-		ThreadPre, _ = NewDB.Prepare(mthreadSQL)
-		MyThreadPre, _ = NewDB.Prepare(mmyThreadSQL)
-
-		//从数据库查找的开关,出错后中断时使用
-		fromUser := true
-		if fromUser == true {
-			userSQL := "SELECT uid,email,username FROM " + XnUser
-			mdata, _ := NewDB.Query(userSQL)
-			for mdata.Next() {
-				var uid int
-				var email, username string
-				data.Scan(&uid,&email,&username)
-				userInfos = append(userInfos, UserInfo{uid, email, username})
-			}
-
-			//添加用户名到缓存
-			for _, v := range userInfos {
-				newUser.UserNames = append(newUser.UserNames, v.Username)
-			}
-		}
-	}
-
 	var insertCount int
 	for data.Next() {
 		d1 := &DUser{}
 		err = data.Scan(&d1.Uid, &d1.GroupId, &d1.Email, &d1.UserName, &d1.Password, &d1.RegDate,&d1.Salt, &d1.UcPassword, &d1.Regip, &d1.Lastip, &d1.Lastvisit)
 		if err != nil {
 			return false, fmt.Sprintf(SelectErr, selectSQL, err)
-		}
-
-		/* 合并用户 */
-		if MergeUser {
-			sameEmail := false
-			//剃除相同邮箱的帐号,更新 post 和 thread形式
-			for _, v := range userInfos {
-				//转换成小写再对比
-				d1.Email = strings.ToLower(d1.Email)
-				v.Email = strings.ToLower(v.Email)
-
-				if d1.Email == v.Email {
-					sameEmail = true
-
-					//邮箱相同则合并帐号
-					_, p1 := PostPre.Exec(v.Uid, d1.Uid)
-					_, p2 := ThreadPre.Exec(v.Uid, d1.Uid)
-					_, p3 := MyThreadPre.Exec(v.Uid, d1.Uid)
-
-					//如果更新失败则
-					if p1 != nil || p2 != nil || p3 != nil {
-						log.Println("Merge Email fail: ", d1.Email, d1.Uid)
-					}
-
-					break
-				}
-			}
-
-			//去除老论坛中的"_s"后缀,转换成小写(gxvtc.com 专属)
-			d1.UserName = strings.ToLower(strings.Replace(d1.UserName, "_s", "", -1))
-			if sameEmail == false {
-				//邮箱不同则添加邮箱到列表
-				userInfos = append(userInfos, UserInfo{d1.Uid, d1.Email, d1.UserName})
-			} else {
-				//相同则跳出以下操作
-				continue
-			}
-
-			//方式二
-			//处理邮箱 - 新用户名的形式
-			//email = replaceData(newUser.Emails, email, 1)
-			//添加 email 到数组中
-			//newUser.Emails = append(newUser.Emails, email)
-
-			//相同的用户名则
-			for _, v := range newUser.UserNames {
-				if d1.UserName == strings.ToLower(v) {
-					d1.UserName = "old." + d1.UserName
-				}
-			}
-			//添加 username 到数组中
-			newUser.UserNames = append(newUser.UserNames, d1.UserName)
-
 		}
 
 		createIp := Ip2long(d1.Regip)
@@ -209,34 +121,6 @@ func ToUser() (bool, string) {
 
 	//用户主帖和回复统计
 	return true, fmt.Sprintf(InsertSuccess, XnUser, insertCount)
-}
-
-/**
-  重命名方式
-  plist 列表,
-  pstr 字符串,
-  ptype 类型(1.邮箱,2.用户名)
-  return 新邮箱或新用户名
- */
-func replaceData(plist []string, pstr string, ptype int) string {
-	for _, v := range plist {
-
-		if pstr == "" {
-			//邮箱则改为通用邮箱
-			if ptype == 1 {
-				pstr = "guest@gxvtc.com"
-			}
-		}
-
-		//如果列表已存在数据则替换
-		if pstr == v {
-			tmp := "old." + pstr
-			//递归替换
-			pstr = replaceData(plist, tmp, ptype)
-		}
-	}
-
-	return pstr
 }
 
 /**

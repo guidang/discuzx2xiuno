@@ -2,9 +2,7 @@ package app
 
 import (
 	"fmt"
-	"strings"
 	"log"
-	"database/sql"
 )
 
 const (

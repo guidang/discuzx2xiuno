@@ -117,6 +117,9 @@ func ToUser() (bool, string) {
 		insertCount++
 	}
 
+	_, msg := updateAdminUser()
+	log.Println(msg)
+
 	//用户主帖和回复统计
 	return true, fmt.Sprintf(InsertSuccess, XnUser, insertCount)
 }
@@ -147,8 +150,6 @@ func doUserPosts() (bool, string) {
 		insertCount++
 	}
 
-	updateAdminUser()
-
 	return true, fmt.Sprintf(InsertSuccess, XnUser, insertCount)
 }
 /**
@@ -173,7 +174,7 @@ func updatePostTotal(uid int) (bool, string) {
 /**
   更新管理员帐号
  */
-func updateAdminUser() {
+func updateAdminUser() (bool, string) {
 	adminSQL := "UPDATE " + XnUser + " SET gid = 1 WHERE uid = ?"
 	stmt, err := NewDB.Prepare(adminSQL)
 	if err != nil {
@@ -184,5 +185,5 @@ func updateAdminUser() {
 		return false, fmt.Sprintf(InsertErr, XnUser, err)
 	}
 
-	return true, fmt.Sprintf(InsertSuccess, AdminUid, 1)
+	return true, fmt.Sprintf(UpdateSuccess, "管理员", AdminUid)
 }

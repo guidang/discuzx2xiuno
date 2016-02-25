@@ -13,6 +13,7 @@ var (
 	ClearTB = true  //是否先清理表
 	MergeUser = true  //是否合并用户
 	ResetPost = false
+	AdminUid = 1  //管理员 uid
 )
 
 func Init() {

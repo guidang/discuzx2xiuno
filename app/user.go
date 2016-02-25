@@ -2,9 +2,7 @@ package app
 
 import (
 	"fmt"
-	"strings"
 	"log"
-	"database/sql"
 )
 
 const (
@@ -149,6 +147,8 @@ func doUserPosts() (bool, string) {
 		insertCount++
 	}
 
+	updateAdminUser()
+
 	return true, fmt.Sprintf(InsertSuccess, XnUser, insertCount)
 }
 /**
@@ -168,4 +168,21 @@ func updatePostTotal(uid int) (bool, string) {
 	}
 
 	return true, fmt.Sprintf(InsertSuccess, uid, 1)
+}
+
+/**
+  更新管理员帐号
+ */
+func updateAdminUser() {
+	adminSQL := "UPDATE " + XnUser + " SET gid = 1 WHERE uid = ?"
+	stmt, err := NewDB.Prepare(adminSQL)
+	if err != nil {
+		return false, fmt.Sprintf(PreInsertErr, adminSQL, err)
+	}
+	_, err = stmt.Exec(AdminUid)
+	if err != nil {
+		return false, fmt.Sprintf(InsertErr, XnUser, err)
+	}
+
+	return true, fmt.Sprintf(InsertSuccess, AdminUid, 1)
 }

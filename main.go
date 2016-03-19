@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	//"github.com/skiy/discuzx-xiuno/app"
-	"./app"
+	"github.com/skiy/discuzx-xiuno/app"
+	//"./app"
 )
 
 func main() {

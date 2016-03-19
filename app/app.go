@@ -101,8 +101,8 @@ func InputDatabase() (oldDb, newDb *sql.DB, err error) {
 
 	for {
 		if oldhost.DBChar == "" {
-			fmt.Println("正在配置discuzx的数据库.....")
 			if oldhost.DBHost == "" {
+				fmt.Println("\r\n正在配置discuzx的数据库.....")
 				fmt.Print("配置discuzx的host(默认为127.0.0.1): ")
 				b, _, _ := r.ReadLine()
 				line := string(b)
@@ -154,8 +154,8 @@ func InputDatabase() (oldDb, newDb *sql.DB, err error) {
 				oldhost.DBChar = line
 			}
 		} else if newhost.DBChar == "" {
-			fmt.Println("正在配置xiuno的数据库.....")
 			if newhost.DBHost == "" {
+				fmt.Println("\r\n正在配置xiuno的数据库.....")
 				fmt.Print("配置xiuno的host(默认为127.0.0.1): ")
 				b, _, _ := r.ReadLine()
 				line := string(b)

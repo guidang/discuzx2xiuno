@@ -6,11 +6,12 @@ import (
 )
 
 const (
-	PreInsertErr = "预插入 %s 失败: %s"
-	InsertErr = "插入 %s 失败: %s"
-	SelectErr = "查询 %s 失败: %s"
-	InsertSuccess = "插入 %s, 成功 %d 条"
-	ClearErrMsg = "清理 %s 失败: %s"
+	PreInsertErr 	= "预插入 %s 失败: %s"
+	InsertErr 		= "插入 %s 失败: %s"
+	SelectErr 		= "查询 %s 失败: %s"
+	InsertSuccess 	= "插入 %s, 成功 %d 条"
+	ClearErrMsg 	= "清理 %s 失败: %s"
+	UpdateSuccess 	= "更新 %s 成功, uid为 %d"
 )
 
 func Ip2long(ipstr string) uint32 {

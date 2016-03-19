@@ -17,6 +17,8 @@ var (
 	ClearTB   = true //是否先清理表
 	MergeUser = true //是否合并用户
 	ResetPost = false
+	//AdminUid = 1  //管理员 uid
+	AdminUid string
 )
 
 func Init() {
@@ -52,13 +54,13 @@ func connDB() (*sql.DB, *sql.DB) {
 	old := &Hostinfo{
 		DBUser:     "root",
 		DBPassword: "123456",
-		DBname:     "gxvtc",
+		DBName:     "gxvtc",
 	}
 
 	new := &Hostinfo{
 		DBUser:     "root",
 		DBPassword: "123456",
-		DBname:     "xiuno",
+		DBName:     "xiuno",
 	}
 
 	oldDB, err := connectMysql(old)
@@ -107,12 +109,12 @@ func InputDatabase() (oldDb, newDb *sql.DB) {
 				line := string(b)
 
 				oldhost.DBPassword = line
-			} else if oldhost.DBname == "" {
+			} else if oldhost.DBName == "" {
 				fmt.Print("配置discuzx的数据库名: ")
 				b, _, _ := r.ReadLine()
 				line := string(b)
 
-				oldhost.DBname = line
+				oldhost.DBName = line
 			} else if oldhost.DBPort == "" {
 				fmt.Print("配置discuzx的数据库端口(默认为3306): ")
 
@@ -160,12 +162,12 @@ func InputDatabase() (oldDb, newDb *sql.DB) {
 				line := string(b)
 
 				newhost.DBPassword = line
-			} else if newhost.DBname == "" {
+			} else if newhost.DBName == "" {
 				fmt.Print("配置xiuno的数据库名: ")
 				b, _, _ := r.ReadLine()
 				line := string(b)
 
-				newhost.DBname = line
+				newhost.DBName = line
 			} else if newhost.DBPort == "" {
 				fmt.Print("配置xiuno的数据库端口(默认为3306): ")
 
@@ -224,50 +226,3 @@ func ClearTable(tbname string) error {
 
 	return err
 }
-
-/*
-
-func Init3() {
-	ToThread()
-}
-
-func Init()  {
-
-	//导入版块
-	//ToForum()
-
-	//开关
-	isRun := false
-
-	isPost :=  false
-	//导入帖子
-	if isRun == true {
-		isPost = ToPost()
-	}
-
-	isThread := false
-	//导入主题
-	if isPost == true {
-		isThread = ToThread()
-	}
-	//ToThread()
-
-	isUser := false
-	if isThread == true {
-		isUser = ToUser()
-		//isUser = true
-	}
-	//导入用户
-	//ToUser()
-
-	isUser,msg := UpdateUser()
-	log.Println(msg)
-
-	if isUser == true {
-		log.Println("===\n Data Import Success! \n===")
-	}
-
-	//ToMyThreads()  //已导入主帖后，导入帖子归属
-
-}
-*/

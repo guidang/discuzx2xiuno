@@ -18,7 +18,7 @@ type Hostinfo struct {
 /**
   连接数据库
 */
-func connectMysql(host *Hostinfo) (*sql.DB, error) {
+func connectMysql(host *Hostinfo) (db *sql.DB, err error) {
 	if host.DBPort == "" {
 		host.DBPort = "3306"
 	}
@@ -33,8 +33,8 @@ func connectMysql(host *Hostinfo) (*sql.DB, error) {
 		log.Println(":::MySQL 字符集为:" + host.DBChar)
 	}
 
-	db, err := sql.Open("mysql", host.DBUser+":"+host.DBPassword+"@"+host.DBHost+"/"+host.DBName+"?charset="+host.DBChar)
-	return db, err
+	db, err = sql.Open("mysql", host.DBUser+":"+host.DBPassword+"@"+host.DBHost+"/"+host.DBName+"?charset="+host.DBChar)
+	return
 }
 
 /**

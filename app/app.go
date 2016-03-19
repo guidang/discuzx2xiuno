@@ -24,7 +24,12 @@ var (
 func Init() {
 	log.Println(":::正在进入app主程序:::")
 	//OldDB, NewDB = connDB()
-	OldDB, NewDB = InputDatabase()
+
+	var err error
+	OldDB, NewDB, err = InputDatabase()
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	_, msg := ToPost()
 	log.Println(msg)
@@ -76,7 +81,7 @@ func connDB() (*sql.DB, *sql.DB) {
 	return oldDB, newDB
 }
 
-func InputDatabase() (oldDb, newDb *sql.DB) {
+func InputDatabase() (oldDb, newDb *sql.DB, err error) {
 	log.Println(":::正在输入数据库:::")
 
 	r := bufio.NewReader(os.Stdin)
@@ -191,22 +196,35 @@ func InputDatabase() (oldDb, newDb *sql.DB) {
 
 				newhost.DBChar = line
 			}
+		} else if(AdminUid == "") {
+			fmt.Print("配置xiuno的管理员的uid(默认为uid为1): ")
+
+			b, _, _ := r.ReadLine()
+			line := string(b)
+
+			if line == "" {
+				line = "1"
+			}
+
+			AdminUid = line
 		} else {
 			break
 		}
 
 	}
 
-	fmt.Println(oldhost, newhost)
+	fmt.Println("\r\nDiscuz!X数据库:",oldhost, "\r\nXiunoBBS数据库:",newhost,"\r\n")
 
-	oldDb, err := connectMysql(oldhost)
+	oldDb, err = connectMysql(oldhost)
 	if err != nil {
 		log.Println("old db connect err: " + err.Error())
+		return
 	}
 
 	newDb, err = connectMysql(newhost)
 	if err != nil {
 		log.Println("new db connect err: " + err.Error())
+		return
 	}
 
 	return

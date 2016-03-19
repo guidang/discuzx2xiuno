@@ -3,11 +3,13 @@ package main
 import (
 	"log"
 
-	"github.com/skiy/discuzx-xiuno/app"
+	//"github.com/skiy/discuzx-xiuno/app"
+	"./app"
 )
 
 func main() {
-	log.Println(`:::欢迎使用DiscuzX3.2 To XiunoBBS3.0 转换程序:::
+	log.Println(`
+	:::欢迎使用DiscuzX3.2 To XiunoBBS3.0 转换程序:::
 	:::作者: Skiychan <dev@skiy.net>
 	:::网站: www.zzzzy.com
 	::: QQ : 1005043848

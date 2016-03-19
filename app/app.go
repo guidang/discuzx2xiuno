@@ -48,6 +48,16 @@ func Init() {
 		_, msg := doUserPosts()
 		log.Println(msg)
 	}
+
+	for {
+		fmt.Println("\r\n::: 转换完成, 按 \"回车键\" 退出程序...")
+		r := bufio.NewReader(os.Stdin)
+		b, _, _ := r.ReadLine()
+		inputLen := len(b)
+		if inputLen == 0 {
+			break
+		}
+	}
 }
 
 /**

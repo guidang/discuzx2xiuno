@@ -107,7 +107,6 @@ func InputDatabase() (oldDb, newDb *sql.DB, err error) {
 	o_flag := "Discuz!X"
 	n_flag := "XiunoBBS"
 
-	//OldHost
 	inputDataInfo(r, oldhost, o_flag)
 	inputDataInfo(r, newhost, n_flag)
 
@@ -115,13 +114,13 @@ func InputDatabase() (oldDb, newDb *sql.DB, err error) {
 
 	oldDb, err = connectMysql(oldhost)
 	if err != nil {
-		fmt.Printf("%s connect err: %s", o_flag, err.Error())
+		fmt.Printf("\r\n%s connect err: %s\r\n", o_flag, err.Error())
 		return
 	}
 
 	newDb, err = connectMysql(newhost)
 	if err != nil {
-		fmt.Printf("%s connect err: %s", n_flag, err.Error())
+		fmt.Printf("\r\n%s connect err: %s\r\n", n_flag, err.Error())
 		return
 	}
 

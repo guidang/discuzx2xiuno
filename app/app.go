@@ -17,12 +17,14 @@ var (
 	ClearTB   = true //是否先清理表
 	MergeUser = true //是否合并用户
 	ResetPost = false
-	//AdminUid = 1  //管理员 uid
 	AdminUid string
 )
 
+/**
+	初始化程序
+ */
 func Init() {
-	log.Println(":::正在进入app主程序:::")
+	fmt.Println("::: 正在进入app主程序...")
 	//OldDB, NewDB = connDB()
 
 	var err error
@@ -91,149 +93,35 @@ func connDB() (*sql.DB, *sql.DB) {
 	return oldDB, newDB
 }
 
+/**
+	配置数据库信息
+ */
 func InputDatabase() (oldDb, newDb *sql.DB, err error) {
-	log.Println(":::正在输入数据库:::")
+	fmt.Println("::: 正在输入数据库信息...")
 
 	r := bufio.NewReader(os.Stdin)
 
 	oldhost := &Hostinfo{}
 	newhost := &Hostinfo{}
 
-	for {
-		if oldhost.DBChar == "" {
-			if oldhost.DBHost == "" {
-				fmt.Println("\r\n正在配置discuzx的数据库.....")
-				fmt.Print("配置discuzx的host(默认为127.0.0.1): ")
-				b, _, _ := r.ReadLine()
-				line := string(b)
+	o_flag := "Discuz!X"
+	n_flag := "XiunoBBS"
 
-				if line == "" {
-					line = "127.0.0.1"
-				}
+	//OldHost
+	inputDataInfo(r, oldhost, o_flag)
+	inputDataInfo(r, newhost, n_flag)
 
-				oldhost.DBHost = line
-			} else if oldhost.DBUser == "" {
-				fmt.Print("配置discuzx的数据库用户: ")
-				b, _, _ := r.ReadLine()
-				line := string(b)
-
-				oldhost.DBUser = line
-			} else if oldhost.DBPassword == "" {
-				fmt.Print("配置discuzx的数据库密码(不能为空): ")
-				b, _, _ := r.ReadLine()
-				line := string(b)
-
-				oldhost.DBPassword = line
-			} else if oldhost.DBName == "" {
-				fmt.Print("配置discuzx的数据库名: ")
-				b, _, _ := r.ReadLine()
-				line := string(b)
-
-				oldhost.DBName = line
-			} else if oldhost.DBPort == "" {
-				fmt.Print("配置discuzx的数据库端口(默认为3306): ")
-
-				b, _, _ := r.ReadLine()
-				line := string(b)
-
-				if line == "" {
-					line = "3306"
-				}
-
-				oldhost.DBPort = line
-			} else if oldhost.DBChar == "" {
-				fmt.Print("配置discuzx的数据库编码(默认为utf8): ")
-
-				b, _, _ := r.ReadLine()
-				line := string(b)
-
-				if line == "" {
-					line = "utf8"
-				}
-
-				oldhost.DBChar = line
-			}
-		} else if newhost.DBChar == "" {
-			if newhost.DBHost == "" {
-				fmt.Println("\r\n正在配置xiuno的数据库.....")
-				fmt.Print("配置xiuno的host(默认为127.0.0.1): ")
-				b, _, _ := r.ReadLine()
-				line := string(b)
-
-				if line == "" {
-					line = "127.0.0.1"
-				}
-
-				newhost.DBHost = line
-			} else if newhost.DBUser == "" {
-				fmt.Print("配置xiuno的数据库用户: ")
-				b, _, _ := r.ReadLine()
-				line := string(b)
-
-				newhost.DBUser = line
-			} else if newhost.DBPassword == "" {
-				fmt.Print("配置xiuno的数据库密码(不能为空): ")
-				b, _, _ := r.ReadLine()
-				line := string(b)
-
-				newhost.DBPassword = line
-			} else if newhost.DBName == "" {
-				fmt.Print("配置xiuno的数据库名: ")
-				b, _, _ := r.ReadLine()
-				line := string(b)
-
-				newhost.DBName = line
-			} else if newhost.DBPort == "" {
-				fmt.Print("配置xiuno的数据库端口(默认为3306): ")
-
-				b, _, _ := r.ReadLine()
-				line := string(b)
-
-				if line == "" {
-					line = "3306"
-				}
-
-				newhost.DBPort = line
-			} else if newhost.DBChar == "" {
-				fmt.Print("配置xiuno的数据库编码(默认为utf8): ")
-
-				b, _, _ := r.ReadLine()
-				line := string(b)
-
-				if line == "" {
-					line = "utf8"
-				}
-
-				newhost.DBChar = line
-			}
-		} else if(AdminUid == "") {
-			fmt.Print("配置xiuno的管理员的uid(默认为uid为1): ")
-
-			b, _, _ := r.ReadLine()
-			line := string(b)
-
-			if line == "" {
-				line = "1"
-			}
-
-			AdminUid = line
-		} else {
-			break
-		}
-
-	}
-
-	fmt.Println("\r\nDiscuz!X数据库:",oldhost, "\r\nXiunoBBS数据库:",newhost,"\r\n")
+	fmt.Printf("\r\n%s: %s \r\n%s: %s \r\n\r\n", o_flag, oldhost, n_flag, newhost)
 
 	oldDb, err = connectMysql(oldhost)
 	if err != nil {
-		log.Println("old db connect err: " + err.Error())
+		fmt.Printf("%s connect err: %s", o_flag, err.Error())
 		return
 	}
 
 	newDb, err = connectMysql(newhost)
 	if err != nil {
-		log.Println("new db connect err: " + err.Error())
+		fmt.Printf("%s connect err: %s", n_flag, err.Error())
 		return
 	}
 
@@ -253,4 +141,100 @@ func ClearTable(tbname string) error {
 	}
 
 	return err
+}
+
+/**
+	输入数据库信息
+ */
+func inputDataInfo(r *bufio.Reader, h *Hostinfo, t string)  {
+	fmt.Printf("\r\n正在配置 %s 的数据库信息.....", t)
+
+	var flag int
+	for {
+		switch flag {
+		case 0:
+			fmt.Printf("\r\n配置 %s 的host(默认为 127.0.0.1): ", t)
+			s := inputData(r)
+
+			if s == "" {
+				s = "127.0.0.1"
+			}
+			h.DBHost = s
+			flag++
+
+		case 1:
+			fmt.Printf("\r\n配置 %s 的数据库用户(默认为 root):", t)
+			s := inputData(r)
+			if s == "" {
+				s = "root"
+			}
+			h.DBUser = s
+			flag++
+
+		case 2:
+			fmt.Printf("\r\n配置 %s 的数据库密码:", t)
+			s := inputData(r)
+			h.DBPassword = s
+			flag++
+
+		case 3:
+			fmt.Printf("\r\n配置 %s 的数据库名:", t)
+			s := inputData(r)
+			if s != "" {
+				h.DBName = s
+				flag++
+			}
+
+		case 4:
+			fmt.Printf("\r\n配置 %s 的数据库端口(默认为3306):", t)
+			s := inputData(r)
+			if s == "" {
+				s = "3306"
+			}
+			h.DBPort = s
+			flag++
+
+		case 5:
+			fmt.Printf("\r\n配置 %s 的数据库编码(默认为utf8):", t)
+			s := inputData(r)
+			if s == "" {
+				s = "utf8"
+			}
+			h.DBPort = s
+			flag++
+
+		default:
+			flag = 99
+
+			if t != "XiunoBBS" {
+				break
+			}
+
+			fmt.Printf("\r\n配置 %s 的管理员的uid(默认为1):", t)
+			s := inputData(r)
+			if s == "" {
+				s = "1"
+			}
+			AdminUid = s
+			break
+		}
+
+		if flag == 99 {
+			break
+		}
+	}
+}
+
+/**
+	键盘输入数据
+ */
+func inputData(r *bufio.Reader) string {
+	b, _, _ := r.ReadLine()
+	s := string(b)
+
+	if s == "q" || s == "Q" {
+		os.Exit(0)
+	}
+
+	return s
 }

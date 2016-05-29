@@ -2,8 +2,8 @@ package app
 
 import (
 	"database/sql"
-	"log"
 	"strings"
+	"fmt"
 )
 
 type Hostinfo struct {
@@ -23,22 +23,28 @@ func connectMysql(host *Hostinfo) (db *sql.DB, err error) {
 		host.DBPort = "3306"
 	}
 
-	if host.DBHost != "" {
-		host.DBHost = "tcp(" + host.DBHost + ":" + host.DBPort + ")"
-		log.Println(":::连接到 MySQL:" + host.DBHost)
-	}
-
 	if host.DBChar == "" {
 		host.DBChar = "utf8"
-		log.Println(":::MySQL 字符集为:" + host.DBChar)
 	}
 
-	db, err = sql.Open("mysql", host.DBUser+":"+host.DBPassword+"@"+host.DBHost+"/"+host.DBName+"?charset="+host.DBChar)
+	if host.DBHost != "" {
+		host.DBHost = "tcp(" + host.DBHost + ":" + host.DBPort + ")"
+	}
+
+	dbStr := fmt.Sprintf("%s:%s@%s/%s?%s",
+		host.DBUser,
+		host.DBPassword,
+		host.DBHost,
+		host.DBName,
+		host.DBChar,
+	)
+
+	db, err = sql.Open("mysql", dbStr)
 	return
 }
 
 /**
-  数据库加前缀
+  数据库字段批量加前缀
  */
 func FieldAddPrev(prev, fieldStr string) string {
 	fieldArr := strings.Split(fieldStr, ",")

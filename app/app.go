@@ -97,7 +97,10 @@ func connDB() (*sql.DB, *sql.DB) {
 	配置数据库信息
  */
 func InputDatabase() (oldDb, newDb *sql.DB, err error) {
-	fmt.Println("::: 正在输入数据库信息...")
+	fmt.Println(`
+::: 正在输入数据库信息...
+::: 执行过程中按"Q", 再按"回车键"退出本程序...
+`)
 
 	r := bufio.NewReader(os.Stdin)
 

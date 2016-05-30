@@ -30,7 +30,7 @@ func Init() {
 	var err error
 	OldDB, NewDB, err = InputDatabase()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln(err.Error())
 	}
 
 	_, msg := ToPost()
@@ -63,10 +63,11 @@ func Init() {
 }
 
 /**
-  连接新旧数据库
+	手动连接
+  	连接新旧数据库
 */
-func connDB() (*sql.DB, *sql.DB) {
-	log.Println(":::正在连接数据库:::")
+func connDB() (oldDB, newDB *sql.DB) {
+	fmt.Println("::: 正在输入数据库信息...")
 
 	old := &Hostinfo{
 		DBUser:     "root",
@@ -80,17 +81,18 @@ func connDB() (*sql.DB, *sql.DB) {
 		DBName:     "xiuno",
 	}
 
-	oldDB, err := connectMysql(old)
+	var err error
+	oldDB, err = connectMysql(old)
 	if err != nil {
-		log.Println("old db connect err: " + err.Error())
+		log.Fatalf("\r\n%s connect err: %s\r\n", "Discuz", err.Error())
 	}
 
-	newDB, err := connectMysql(new)
+	newDB, err = connectMysql(new)
 	if err != nil {
-		log.Println("new db connect err: " + err.Error())
+		log.Fatalf("\r\n%s connect err: %s\r\n", "Xiuno", err.Error())
 	}
 
-	return oldDB, newDB
+	return
 }
 
 /**
@@ -117,29 +119,28 @@ func InputDatabase() (oldDb, newDb *sql.DB, err error) {
 
 	oldDb, err = connectMysql(oldhost)
 	if err != nil {
-		fmt.Printf("\r\n%s connect err: %s\r\n", o_flag, err.Error())
-		return
+		log.Fatalf("\r\n%s connect err: %s\r\n", o_flag, err.Error())
 	}
 
 	newDb, err = connectMysql(newhost)
 	if err != nil {
-		fmt.Printf("\r\n%s connect err: %s\r\n", n_flag, err.Error())
-		return
+		log.Fatalf("\r\n%s connect err: %s\r\n", n_flag, err.Error())
 	}
 
 	return
 }
 
 /**
-  清理 表
+  	清理数据表
 */
 func ClearTable(tbname string) error {
-	log.Println(":::正在清理 " + tbname + " 表:::")
-	clearSQL := "TRUNCATE TABLE " + tbname
+	fmt.Printf(":::正在清理 %s 表\r\n", tbname)
+
+	clearSQL := fmt.Sprintf("TRUNCATE TABLE %s", tbname)
 
 	_, err := NewDB.Exec(clearSQL)
 	if err != nil {
-		log.Println(":::清理 " + tbname + " 失败: " + err.Error())
+		fmt.Printf(":::清理 %s 表失败: %s\r\n", tbname, err.Error())
 	}
 
 	return err

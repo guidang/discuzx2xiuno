@@ -9,7 +9,7 @@ import (
 
 func main() {
 	fmt.Println(`
-::: 欢迎使用DiscuzX3.2 To XiunoBBS3.0 转换程序
+::: 欢迎使用Discuz!X3.2 To XiunoBBS3.0 转换程序
 ::: 作者: Skiychan <dev@skiy.net>
 ::: 网站: https://www.zzzzy.com
 ::: QQ : 1005043848

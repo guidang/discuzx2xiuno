@@ -14,11 +14,16 @@ import (
 var (
 	OldDB,
 	NewDB *sql.DB
+	ResetPost = false
+	Exts Extenter
 	ClearTB   = true //是否先清理表
 	MergeUser = true //是否合并用户
-	ResetPost = false
-	AdminUid string
 )
+
+type Extenter struct {
+	AdminUid string  //管理员 uid
+	UpdateFromDz bool  //是否从旧版的 dz 升级到 dx 的
+}
 
 /**
 	初始化程序
@@ -33,22 +38,33 @@ func Init() {
 		log.Fatalln(err.Error())
 	}
 
-	_, msg := ToPost()
-	log.Println(msg)
+	//设置 uid 和 判断升级版本
+	inputOtherInfo()
 
-	_, msg = ToThread()
-	log.Println(msg)
+	var msg string
 
-	_, msg = ToForum()
-	log.Println(msg)
+	//转换回复帖子
+	msg = ToPost()
+	fmt.Println(msg, "\r\n")
 
-	_, msg = ToUser()
-	log.Println(msg)
+	//转换主题帖子
+	msg = ToThread()
+	fmt.Println(msg, "\r\n")
+
+	//转换版块
+	msg = ToForum()
+	fmt.Println(msg, "\r\n")
+
+	msg = ToUser()
+	fmt.Println(msg, "\r\n")
+
+	msg = updateAdminUser()
+	fmt.Println(msg, "\r\n")
 
 	/* 更新全部用户帖子数量 */
 	if ResetPost {
-		_, msg := doUserPosts()
-		log.Println(msg)
+		msg := doUserPosts()
+		fmt.Println(msg, "\r\n")
 	}
 
 	for {
@@ -57,7 +73,7 @@ func Init() {
 		b, _, _ := r.ReadLine()
 		inputLen := len(b)
 		if inputLen == 0 {
-			break
+			os.Exit(0)
 		}
 	}
 }
@@ -112,6 +128,7 @@ func InputDatabase() (oldDb, newDb *sql.DB, err error) {
 	o_flag := "Discuz!X"
 	n_flag := "XiunoBBS"
 
+
 	inputDataInfo(r, oldhost, o_flag)
 	inputDataInfo(r, newhost, n_flag)
 
@@ -134,6 +151,11 @@ func InputDatabase() (oldDb, newDb *sql.DB, err error) {
   	清理数据表
 */
 func ClearTable(tbname string) error {
+	//若不清理表则
+	if !ClearTB {
+		return nil
+	}
+
 	fmt.Printf(":::正在清理 %s 表\r\n", tbname)
 
 	clearSQL := fmt.Sprintf("TRUNCATE TABLE %s", tbname)
@@ -203,28 +225,42 @@ func inputDataInfo(r *bufio.Reader, h *Hostinfo, t string)  {
 			if s == "" {
 				s = "utf8"
 			}
-			h.DBPort = s
-			flag++
-
-		default:
+			h.DBChar = s
 			flag = 99
-
-			if t != "XiunoBBS" {
-				break
-			}
-
-			fmt.Printf("\r\n配置 %s 的管理员的uid(默认为1):", t)
-			s := inputData(r)
-			if s == "" {
-				s = "1"
-			}
-			AdminUid = s
 			break
 		}
 
 		if flag == 99 {
 			break
 		}
+	}
+}
+
+/**
+	输入扩展信息
+ */
+func inputOtherInfo()  {
+	r := bufio.NewReader(os.Stdin)
+
+	//配置 uid
+	fmt.Printf("\r\n配置管理员的uid(默认为1):")
+	s := inputData(r)
+	if s == "" {
+		s = "1"
+	}
+	Exts.AdminUid = s
+
+	//是否从 dz 升级上来的
+	fmt.Printf(`
+数据是否从老版本Discuz!系列升级到Discuz!X系列?
+请输入 "Y" or "N"(默认为否N):
+`)
+
+	s = inputData(r)
+	if s == "Y" || s == "y" {
+		Exts.UpdateFromDz = true
+	} else {
+		Exts.UpdateFromDz = false
 	}
 }
 

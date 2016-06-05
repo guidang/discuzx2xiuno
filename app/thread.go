@@ -2,7 +2,6 @@ package app
 
 import (
 	"fmt"
-	"log"
 )
 
 const (
@@ -15,66 +14,78 @@ const (
  xn 主题表
  */
 type Thread struct {
-	Fid int  //版块 id
-	Tid int  //主题 id
-	Uid int  //发帖者id
-	UserIp int  //发帖者 ip
+	Fid,  //版块 id
+	Tid,  //主题 id
+	Uid,  //发帖者id
+	UserIp,  //发帖者 ip
+	CreateDate,  //发帖时间
+	LastDate,  //最后回复时间
+	Views,  //浏览数
+	Posts,  //回复数
+	FirstPId,  //主题帖 id
+	LastUid,  //最后回复人
+	LastPid int64  //最后回复 id
 	Subject string  //标题
-	CreateDate int  //发帖时间
-	LastDate int  //最后回复时间
-	Views int  //浏览数
-	Posts int  //回复数
-	FirstPId int  //主题帖 id
-	LastUid int  //最后回复人
-	LastPid int  //最后回复 id
 }
 
 /**
  dx 主题表
  */
 type DThread struct {
-	Tid int  //主题 id
-	Fid int  //版块 id
-	AuthorId int  //发帖者id
+	Tid,  //主题 id
+	Fid,  //版块 id
+	AuthorId,  //发帖者id
+	Dateline,  //发帖时间
+	Lastpost,  //最后回复时间
+	Views,  //浏览数
+	Replies int64  //回复数
 	Subject string  //标题
-	Dateline int  //发帖时间
-	Lastpost int  //最后回复时间
-	Views int  //浏览数
-	Replies int  //回复数
 }
 
-func ToThread() (bool, string) {
-	log.Println(":::正在导入 threads...")
+/**
+	转换主题
+ */
+func ToThread() string {
+	fmt.Println(":::正在导入主题 threads...")
 
 	//查找最早、最迟的 PostId 及最迟的 PostIP
-	selectThread := `SELECT (SELECT userip FROM ` + XnPost + ` WHERE tid = ? AND isfirst = 1 LIMIT 1) as userip, (SELECT pid FROM bbs_post WHERE tid = ? AND isfirst = 1 LIMIT 1) AS minpid, pid, uid FROM ` + XnPost + ` WHERE tid = ? ORDER BY create_date DESC LIMIT 1`
-	selectSQL := "SELECT tid,fid,authorid,subject,dateline,lastpost,views,replies FROM " + DxThread  // + " LIMIT 100"
-	insertSQL := `INSERT INTO ` + XnThread + ` (fid,tid,uid,userip,subject,create_date,last_date,views,posts,firstpid,lastuid,lastpid) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`
-	myThreadsSQL := "INSERT INTO " + XnMyThread + " VALUES (?,?)"
+	selectThread := fmt.Sprintf(`SELECT
+(SELECT userip FROM %s WHERE tid = ? AND isfirst = 1 LIMIT 1) AS userip,
+(SELECT pid FROM bbs_post WHERE tid = ? AND isfirst = 1 LIMIT 1) AS minpid,
+pid, uid
+FROM %s
+WHERE tid = ?
+ORDER BY create_date DESC
+LIMIT 1`, XnPost, XnPost)
+
+	selectSQL := fmt.Sprintf("SELECT tid,fid,authorid,subject,dateline,lastpost,views,replies FROM %s", DxThread)  // + " LIMIT 100"
+	insertSQL := fmt.Sprintf(`INSERT INTO %s (fid,tid,uid,userip,subject,create_date,last_date,views,posts,firstpid,lastuid,lastpid) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`, XnThread)
+	myThreadsSQL := fmt.Sprintf("INSERT INTO %s VALUES (?,?)", XnMyThread)
 
 	var clearErr error
 	if clearErr = ClearTable(XnThread); clearErr != nil {
-		return false, fmt.Sprintf(ClearErrMsg, XnThread, clearErr)
+		return fmt.Sprintf(ClearErrMsg, XnThread, clearErr.Error())
 	}
+
 	if clearErr = ClearTable(XnMyThread); clearErr != nil {
-		return false, fmt.Sprintf(ClearErrMsg, XnMyThread, clearErr)
+		return fmt.Sprintf(ClearErrMsg, XnMyThread, clearErr.Error())
 	}
 
 	var userIp,firstPid,lastPid,lastUid int
 
 	data, err := OldDB.Query(selectSQL)
 	if err != nil {
-		return false, fmt.Sprintf(SelectErr, XnPost, err)
+		return fmt.Sprintf(SelectSQLErr, err.Error(), selectSQL)
 	}
 
 	stmt, err := NewDB.Prepare(insertSQL)
 	if err != nil {
-		return false, fmt.Sprintf(PreInsertErr, insertSQL, err)
+		return fmt.Sprintf(PreInsSQLErr, err.Error(), insertSQL)
 	}
 
 	myTStmt, err := NewDB.Prepare(myThreadsSQL)
 	if err != nil {
-		return false, fmt.Sprintf(PreInsertErr, myThreadsSQL, err)
+		return fmt.Sprintf(PreInsSQLErr, err.Error(), myThreadsSQL)
 	}
 
 	var insertCount int
@@ -82,28 +93,30 @@ func ToThread() (bool, string) {
 		d1 := &DThread{}
 		err = data.Scan(&d1.Tid, &d1.Fid, &d1.AuthorId, &d1.Subject, &d1.Dateline, &d1.Lastpost, &d1.Views, &d1.Replies)
 		if err != nil {
-			return false, fmt.Sprintf(SelectErr, selectSQL, err)
+			return fmt.Sprintf(SelectSQLErr, err.Error(), selectSQL)
 		}
+
+		tidStr := fmt.Sprintf(" tid:%d", d1.Tid)
 
 		err = NewDB.QueryRow(selectThread,d1.Tid,d1.Tid,d1.Tid).Scan(&userIp,&firstPid,&lastPid,&lastUid)
 		if err != nil {
-			fmt.Printf(SelectErr + "\n", XnPost, err)
+			fmt.Printf(SelectSQLErr + "\n", err.Error() + tidStr, XnPost)
 			continue
 		}
 
 		_, err = stmt.Exec(d1.Fid,d1.Tid,d1.AuthorId,userIp,d1.Subject,d1.Dateline,d1.Lastpost,d1.Views,d1.Replies,firstPid,lastUid,lastPid)
 		if err != nil {
-			return false, fmt.Sprintf(InsertErr, insertSQL, err)
+			return fmt.Sprintf(InsertErr, insertSQL, err.Error() + tidStr)
 		}
 
 		_, err = myTStmt.Exec(d1.AuthorId, d1.Tid)
 		if err != nil {
-			return false, fmt.Sprintf(InsertErr, myThreadsSQL, err)
+			return fmt.Sprintf(InsertErr, myThreadsSQL, err.Error() + tidStr)
 		}
 
 		insertCount++
 
 	}
 
-	return true, fmt.Sprintf(InsertSuccess, XnThread,insertCount)
+	return fmt.Sprintf(InsertSuccess, XnThread, insertCount)
 }

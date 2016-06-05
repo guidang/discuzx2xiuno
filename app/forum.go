@@ -2,7 +2,6 @@ package app
 
 import (
 	"fmt"
-	"log"
 
 	"time"
 	"strconv"
@@ -17,45 +16,45 @@ const (
  xn 版块表
  */
 type Forum struct  {
-	Fid int  //版块 id
+	Fid,  //版块 id
+	Threads,  //主题数
+	CreateDate int64  //创建时间
+	Brief,  //介绍
 	Name string  //版块名
-	Threads int  //主题数
-	Brief string  //介绍
-	CreateDate int  //创建时间
 }
 
 /**
  dx 版块表
  */
 type DForum struct {
-	Fid int  //版块 id
+	Fid,  //版块 id
+	Threads int64  //主题数
 	Name string  //版块名称
-	Threads int  //主题数
 }
 
-func ToForum() (bool, string) {
-	log.Println(":::正在导入 forums...")
+func ToForum() string {
+	fmt.Println(":::正在导入 forums...")
 
 	//当前时间
 	tmStr1 := time.Now().Unix()
 	tmStr := strconv.FormatInt(tmStr1, 10)
 
-	selectSQL := "SELECT fid,name,threads FROM " + DxForum
-	insertSQL := "INSERT INTO " + XnForum + "(fid, name, threads, brief, create_date) VALUES (?, ?, ?, '', '" + tmStr + "')"
+	selectSQL := fmt.Sprintf("SELECT fid,name,threads FROM %s", DxForum)
+	insertSQL := fmt.Sprintf("INSERT INTO  %s (fid, name, threads, brief, create_date) VALUES (?, ?, ?, '', '%s')", XnForum, tmStr)
 
 	var clearErr error
 	if clearErr = ClearTable(XnForum); clearErr != nil {
-		return false, fmt.Sprintf(ClearErrMsg, XnForum, clearErr)
+		return fmt.Sprintf(ClearErrMsg, XnForum, clearErr.Error())
 	}
 
 	data, err := OldDB.Query(selectSQL)
 	if err != nil {
-		return false, fmt.Sprintf(SelectErr, selectSQL, err)
+		return fmt.Sprintf(SelectSQLErr, err.Error(), selectSQL)
 	}
 
 	stmt, err := NewDB.Prepare(insertSQL)
 	if err != nil {
-		return false, fmt.Sprintf(PreInsertErr, insertSQL, err)
+		return fmt.Sprintf(PreInsSQLErr, err.Error(), insertSQL)
 	}
 
 	var insertCount int
@@ -63,16 +62,16 @@ func ToForum() (bool, string) {
 		d1 := &DForum{}
 		err = data.Scan(&d1.Fid, &d1.Name, &d1.Threads)
 		if err != nil {
-			return false, fmt.Sprintf(SelectErr, selectSQL, err)
+			return fmt.Sprintf(SelectSQLErr, err.Error(), selectSQL)
 		}
 
 		_, err := stmt.Exec(d1.Fid, d1.Name, d1.Threads)
 		if err != nil {
-			return false, fmt.Sprintf(InsertErr, XnForum, err)
+			return fmt.Sprintf(InsertErr, XnForum, err.Error())
 		}
 
 		insertCount++
 	}
 
-	return true, fmt.Sprintf(InsertSuccess, XnForum, insertCount)
+	return fmt.Sprintf(InsertSuccess, XnForum, insertCount)
 }

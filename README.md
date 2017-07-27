@@ -1,4 +1,4 @@
-Discux!X 3.2 转 Xiuno BBS 4.x
+Discux!X 3.2+ 转 Xiuno BBS 4.x
 ------
 
 ## ToDo List
@@ -7,7 +7,6 @@ Discux!X 3.2 转 Xiuno BBS 4.x
 - GUI界面实现
 
 ## 使用教程
-------
 - ```go get github.com/skiy/discuzx-xiuno```   
 - 执行 go run main.go
 - 完成

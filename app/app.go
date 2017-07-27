@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	"log"
 
-	_ "github.com/go-sql-driver/mysql"
 	"bufio"
-	"os"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+	"os"
 )
 
 //数据库初始化
@@ -15,19 +15,19 @@ var (
 	OldDB,
 	NewDB *sql.DB
 	ResetPost = false
-	Exts Extenter
+	Exts      Extenter
 	ClearTB   = true //是否先清理表
 	MergeUser = true //是否合并用户
 )
 
 type Extenter struct {
-	AdminUid string  //管理员 uid
-	UpdateFromDz bool  //是否从旧版的 dz 升级到 dx 的
+	AdminUid     string //管理员 uid
+	UpdateFromDz bool   //是否从旧版的 dz 升级到 dx 的
 }
 
 /**
-	初始化程序
- */
+初始化程序
+*/
 func Init() {
 	fmt.Println("::: 正在进入app主程序...")
 	//OldDB, NewDB = connDB()
@@ -112,8 +112,8 @@ func connDB() (oldDB, newDB *sql.DB) {
 }
 
 /**
-	配置数据库信息
- */
+配置数据库信息
+*/
 func InputDatabase() (oldDb, newDb *sql.DB, err error) {
 	fmt.Println(`
 ::: 正在输入数据库信息...
@@ -127,7 +127,6 @@ func InputDatabase() (oldDb, newDb *sql.DB, err error) {
 
 	o_flag := "Discuz!X"
 	n_flag := "XiunoBBS"
-
 
 	inputDataInfo(r, oldhost, o_flag)
 	inputDataInfo(r, newhost, n_flag)
@@ -148,7 +147,7 @@ func InputDatabase() (oldDb, newDb *sql.DB, err error) {
 }
 
 /**
-  	清理数据表
+清理数据表
 */
 func ClearTable(tbname string) error {
 	//若不清理表则
@@ -169,9 +168,9 @@ func ClearTable(tbname string) error {
 }
 
 /**
-	输入数据库信息
- */
-func inputDataInfo(r *bufio.Reader, h *Hostinfo, t string)  {
+输入数据库信息
+*/
+func inputDataInfo(r *bufio.Reader, h *Hostinfo, t string) {
 	fmt.Printf("\r\n正在配置 %s 的数据库信息.....", t)
 
 	var flag int
@@ -237,9 +236,9 @@ func inputDataInfo(r *bufio.Reader, h *Hostinfo, t string)  {
 }
 
 /**
-	输入扩展信息
- */
-func inputOtherInfo()  {
+输入扩展信息
+*/
+func inputOtherInfo() {
 	r := bufio.NewReader(os.Stdin)
 
 	//配置 uid
@@ -265,8 +264,8 @@ func inputOtherInfo()  {
 }
 
 /**
-	键盘输入数据
- */
+键盘输入数据
+*/
 func inputData(r *bufio.Reader) string {
 	b, _, _ := r.ReadLine()
 	s := string(b)

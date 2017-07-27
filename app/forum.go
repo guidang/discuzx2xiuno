@@ -3,8 +3,8 @@ package app
 import (
 	"fmt"
 
-	"time"
 	"strconv"
+	"time"
 )
 
 const (
@@ -13,23 +13,23 @@ const (
 )
 
 /**
- xn 版块表
- */
-type Forum struct  {
-	Fid,  //版块 id
-	Threads,  //主题数
-	CreateDate int64  //创建时间
-	Brief,  //介绍
-	Name string  //版块名
+xn 版块表
+*/
+type Forum struct {
+	Fid, //版块 id
+	Threads, //主题数
+	CreateDate int64 //创建时间
+	Brief, //介绍
+	Name string //版块名
 }
 
 /**
- dx 版块表
- */
+dx 版块表
+*/
 type DForum struct {
-	Fid,  //版块 id
-	Threads int64  //主题数
-	Name string  //版块名称
+	Fid, //版块 id
+	Threads int64 //主题数
+	Name string //版块名称
 }
 
 func ToForum() string {

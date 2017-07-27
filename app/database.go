@@ -2,8 +2,8 @@ package app
 
 import (
 	"database/sql"
-	"strings"
 	"fmt"
+	"strings"
 )
 
 type Hostinfo struct {
@@ -45,7 +45,7 @@ func connectMysql(host *Hostinfo) (db *sql.DB, err error) {
 
 /**
   数据库字段批量加前缀
- */
+*/
 func FieldAddPrev(prev, fieldStr string) string {
 	fieldArr := strings.Split(fieldStr, ",")
 

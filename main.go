@@ -1,7 +1,6 @@
 package main
 
 import (
-
 	"github.com/skiy/discuzx-xiuno/app"
 	//"./app"
 	"fmt"

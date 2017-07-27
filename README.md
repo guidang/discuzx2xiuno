@@ -1,13 +1,20 @@
-Discux!X 3.2 转 Xiuno BBS
+Discux!X 3.2 转 Xiuno BBS 4.x
+------
 
-## Use
+## ToDo List
+- 支持Xiuno4.x
+- 附件转换
+- GUI界面实现
+
+## 使用教程
+------
 - ```go get github.com/skiy/discuzx-xiuno```   
 - 执行 go run main.go
 - 完成
 
-## Logs
+## 更新日志
 
-## Author
+## 联系
 Author: Skiychan   
 Email : dev@skiy.net   
-Link  : https://www.zzzzy.com   
+Link  : https://www.skiy.net   

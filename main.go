@@ -8,10 +8,10 @@ import (
 
 func main() {
 	fmt.Println(`
-::: 欢迎使用Discuz!X3.2 To XiunoBBS3.0 转换程序
+::: 欢迎使用Discuz!X3.* To XiunoBBS4.0 转换程序
 ::: 作者: Skiychan <dev@skiy.net>
-::: 网站: https://www.zzzzy.com
-::: QQ : 1005043848
+::: 网站: https://www.skiy.net
+::: QQ : 869990770
 ::: 本程序已开源托管至GitHub: https://github.com/skiy/discuzx-xiuno
 `)
 

@@ -10,9 +10,9 @@ Discux!X 3.2+ 转 Xiuno BBS 4.x
 MIT
 
 ### 使用教程
-- ```go get github.com/skiy/discuzx-xiuno```   
-- 执行 go run main.go
-- 完成
+- 拉取依赖库 ```go get github.com/skiy/discuzx-xiuno```   
+- 编译程序 ```go build```
+- 完成，文件在 ```$GOPATH/bin``` 里
 
 ### 更新日志
 

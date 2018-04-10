@@ -1,17 +1,16 @@
-Discux!X 3.2+ 转 Xiuno BBS 4.x
+Discux!X 3.2+ 转 Xiuno BBS 3.x
 ------
 
-### ToDo List
-- 支持Xiuno4.x
-- 附件转换
-- GUI界面实现
+**本项目已停止更新，Dx3.x 转 Xn4.x 功能将迁移至新项目：   
+https://github.com/skiy/xiuno-tools**
+
 
 ### 开源协议
 MIT
 
 ### 使用教程
 - 拉取依赖库 ```go get github.com/skiy/discuzx-xiuno```   
-- 编译程序 ```go build```
+- 编译程序 ```go install```
 - 完成，文件在 ```$GOPATH/bin``` 里
 
 ### 更新日志

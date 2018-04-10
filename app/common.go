@@ -16,7 +16,6 @@ const (
 
 /**
 IP 转整型
-
 */
 func Ip2long(ipstr string) uint32 {
 	ip := net.ParseIP(ipstr)

@@ -1,8 +1,8 @@
 Discux!X 3.2+ 转 Xiuno BBS 3.x
 ------
 
-**本项目已停止更新，Dx3.x 转 Xn4.x 功能将迁移至新项目：   
-https://github.com/skiy/xiuno-tools**
+**本项目已停止更新，Discuz!X 3.x 转 XiunoBBS 4.x 功能将迁移至新项目：   
+https://github.com/skiy/discuzx-xiuno**
 
 
 ### 开源协议
